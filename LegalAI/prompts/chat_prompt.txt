@@ -1,0 +1,5 @@
+Dữ liệu hồ sơ trong phạm vi quyền của người dùng:
+{{data}}
+
+Câu hỏi: {{question}}
+Hãy trả lời chỉ dựa trên dữ liệu trên. Nếu không tìm thấy, nói rõ không có dữ liệu.

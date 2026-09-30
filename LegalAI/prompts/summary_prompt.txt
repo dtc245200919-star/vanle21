@@ -1,0 +1,2 @@
+Tóm tắt hồ sơ sau theo đúng 5 mục: (1) Nội dung chính; (2) Người/phòng ban phụ trách; (3) Thời hạn; (4) Điểm cần chú ý; (5) Dữ liệu còn thiếu. Chỉ dùng thông tin hồ sơ.
+HỒ SƠ: {{legal_document}}
