@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ ERD - Quản Lý Đơn Đặt Hàng</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Mermaid.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar and grid styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .erd-grid-bg {
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .mermaid svg {
+            max-width: none !important;
+            height: auto !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-50">
+
+    <!-- Top Header -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid me-0.5 fa-sitemap text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
+                        Thiết Kế CSDL ERD
+                        <span class="text-xs bg-brand-500/20 text-brand-300 font-medium px-2 py-0.5 rounded-full border border-brand-500/30">Bài Thực Hành</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Hệ Thống Quản Lý Đơn Đặt Hàng & Phiếu Giao Hàng</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <a href="#github-guide" class="text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg transition border border-slate-700 flex items-center gap-2">
+                    <i class="fa-brands fa-github text-sm"></i>
+                    <span class="hidden sm:inline">Hướng dẫn nộp GitHub</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Quick Info Banner -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2 text-xs font-semibold text-brand-600 uppercase tracking-wider">
+                    <i class="fa-solid fa-circle-check"></i> Đã chuẩn hóa & Chuẩn bị sẵn sàng
+                </div>
+                <h2 class="text-xl font-bold text-slate-900">Mô hình Thực thể - Liên kết (ERD)</h2>
+                <p class="text-sm text-slate-600">Đã gộp thực thể Khách hàng, tạo các thực thể liên kết <code>CHI_TIET_DON_HANG</code> và <code>CHI_TIET_PHIEU_GIAO</code>.</p>
+            </div>
+
+            <!-- Action Export Buttons -->
+            <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                <button onclick="downloadPNG()" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm px-4 py-2.5 rounded-xl shadow-md shadow-brand-500/20 transition active:scale-95">
+                    <i class="fa-solid fa-file-image"></i>
+                    <span>Tải ảnh PNG</span>
+                </button>
+                <button onclick="downloadSVG()" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95">
+                    <i class="fa-solid fa-vector-square"></i>
+                    <span>Tải SVG</span>
+                </button>
+                <button onclick="downloadREADME()" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-4 py-2.5 rounded-xl shadow-md shadow-emerald-500/20 transition active:scale-95">
+                    <i class="fa-brands fa-markdown"></i>
+                    <span>Tải README.md</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Interactive ERD Viewer Card -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+            <!-- Viewport Bar -->
+            <div class="bg-slate-100/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center space-x-2 text-xs text-slate-500 font-medium">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <span>Hiển thị trực quan Mermaid.js</span>
+                    <span class="text-slate-300">|</span>
+                    <span id="zoom-level">Thu phóng: 100%</span>
+                </div>
+
+                <!-- Zoom Controls -->
+                <div class="flex items-center space-x-1 bg-white p-1 rounded-lg border border-slate-200 shadow-xs">
+                    <button onclick="zoomERD(0.1)" title="Phóng to" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded-md transition">
+                        <i class="fa-solid fa-magnifying-glass-plus text-xs"></i>
+                    </button>
+                    <button onclick="zoomERD(-0.1)" title="Thu nhỏ" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded-md transition">
+                        <i class="fa-solid fa-magnifying-glass-minus text-xs"></i>
+                    </button>
+                    <button onclick="resetZoom()" title="Đặt lại" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded-md transition">
+                        <i class="fa-solid fa-rotate-left text-xs"></i>
+                    </button>
+                    <button onclick="toggleFullscreen()" title="Toàn màn hình" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded-md transition">
+                        <i class="fa-solid fa-expand text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Canvas Viewport -->
+            <div id="erd-viewport" class="erd-grid-bg relative overflow-auto p-8 min-h-[520px] max-h-[700px] flex items-center justify-center cursor-grab active:cursor-grabbing">
+                <div id="erd-container" class="transition-transform duration-150 origin-center">
+                    <!-- Mermaid ERD Diagram Code -->
+                    <pre class="mermaid">
+erDiagram
+    DON_VI_KHACH {
+        string Ma_DV PK "Mã đơn vị"
+        string Ten_DV "Tên đơn vị"
+        string Dia_chi "Địa chỉ"
+        string Dien_thoai "Điện thoại"
+    }
+
+    NGUOI_DAT {
+        string Ma_so_ND PK "Mã số người đặt"
+        string Ho_ten_ND "Họ tên người đặt"
+        string Ma_DV FK "Đơn vị đặt"
+    }
+
+    NGUOI_NHAN {
+        string Ma_so_NN PK "Mã số người nhận"
+        string Ho_ten_NN "Họ tên người nhận"
+        string Ma_DV FK "Đơn vị khách"
+    }
+
+    NGUOI_GIAO {
+        string Ma_so_NG PK "Mã số người giao"
+        string Ho_ten_NG "Họ tên người giao"
+    }
+
+    NOI_GIAO {
+        string Ma_so_DDG PK "Mã số nơi giao"
+        string Ten_noi_giao "Tên địa điểm giao"
+    }
+
+    HANG {
+        string Ma_hang PK "Mã hàng hoá"
+        string Ten_hang "Tên hàng hoá"
+        string Dv_tinh "Đơn vị tính"
+        string Mo_ta_hang "Mô tả chi tiết"
+    }
+
+    DON_DAT_HANG {
+        string So_DH PK "Số đơn hàng"
+        date Ngay_dat "Ngày đặt hàng"
+        string Ma_so_ND FK "Người đặt"
+    }
+
+    PHIEU_GIAO_HANG {
+        string So_PG PK "Số phiếu giao"
+        date Ngay_giao "Ngày giao"
+        string So_DH FK "Theo đơn hàng"
+        string Ma_so_NG FK "Người giao"
+        string Ma_so_NN FK "Người nhận"
+        string Ma_so_DDG FK "Nơi giao"
+    }
+
+    CHI_TIET_DON_HANG {
+        string So_DH PK_FK "Số đơn hàng"
+        string Ma_hang PK_FK "Mã hàng"
+        int So_luong "Số lượng đặt"
+    }
+
+    CHI_TIET_PHIEU_GIAO {
+        string So_PG PK_FK "Số phiếu giao"
+        string Ma_hang PK_FK "Mã hàng"
+        int So_luong "Số lượng giao"
+        double Don_gia "Đơn giá giao"
+        double Thanh_tien "Thành tiền"
+    }
+
+    DON_VI_KHACH ||--o{ NGUOI_DAT : "có_người_đặt"
+    DON_VI_KHACH ||--o{ NGUOI_NHAN : "có_người_nhận"
+    NGUOI_DAT ||--o{ DON_DAT_HANG : "lập"
+    DON_DAT_HANG ||--o{ CHI_TIET_DON_HANG : "chứa"
+    HANG ||--o{ CHI_TIET_DON_HANG : "được_đặt"
+    DON_DAT_HANG ||--o{ PHIEU_GIAO_HANG : "phát_sinh"
+    NGUOI_GIAO ||--o{ PHIEU_GIAO_HANG : "thực_hiện"
+    NGUOI_NHAN ||--o{ PHIEU_GIAO_HANG : "tiếp_nhận"
+    NOI_GIAO ||--o{ PHIEU_GIAO_HANG : "giao_tại"
+    PHIEU_GIAO_HANG ||--o{ CHI_TIET_PHIEU_GIAO : "chứa"
+    HANG ||--o{ CHI_TIET_PHIEU_GIAO : "được_giao"
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Entity Breakdown Section -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
+            <div class="border-b border-slate-200 pb-4">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-table-list text-brand-600"></i>
+                    Chi Tiết Các Thực Thể Và Bảng Cơ Sở Dữ Liệu
+                </h3>
+                <p class="text-sm text-slate-500 mt-1">Danh sách bảng đã qua bước chuẩn hóa dữ liệu (Các khóa chính PK và khóa ngoại FK)</p>
+            </div>
+
+            <!-- Entities Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Entity 1: DON_VI_KHACH -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <div class="bg-slate-800 text-white px-4 py-2.5 font-semibold text-sm flex items-center justify-between">
+                        <span>1. DON_VI_KHACH</span>
+                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Thực thể chính</span>
+                    </div>
+                    <div class="p-4">
+                        <table class="w-full text-xs text-left">
+                            <thead class="text-slate-500 border-b border-slate-200 uppercase font-semibold">
+                                <tr>
+                                    <th class="py-1.5">Tên cột</th>
+                                    <th class="py-1.5">Loại</th>
+                                    <th class="py-1.5">Mô tả</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono text-slate-700">
+                                <tr><td class="py-1.5 font-bold text-indigo-600">Ma_DV (PK)</td><td>VARCHAR</td><td class="font-sans">Mã đơn vị khách</td></tr>
+                                <tr><td class="py-1.5">Ten_DV</td><td>NVARCHAR</td><td class="font-sans">Tên đơn vị đặt/khách</td></tr>
+                                <tr><td class="py-1.5">Dia_chi</td><td>NVARCHAR</td><td class="font-sans">Địa chỉ đơn vị</td></tr>
+                                <tr><td class="py-1.5">Dien_thoai</td><td>VARCHAR</td><td class="font-sans">Số điện thoại liên hệ</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Entity 2: HANG -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <div class="bg-slate-800 text-white px-4 py-2.5 font-semibold text-sm flex items-center justify-between">
+                        <span>2. HANG</span>
+                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Thực thể chính</span>
+                    </div>
+                    <div class="p-4">
+                        <table class="w-full text-xs text-left">
+                            <thead class="text-slate-500 border-b border-slate-200 uppercase font-semibold">
+                                <tr>
+                                    <th class="py-1.5">Tên cột</th>
+                                    <th class="py-1.5">Loại</th>
+                                    <th class="py-1.5">Mô tả</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono text-slate-700">
+                                <tr><td class="py-1.5 font-bold text-indigo-600">Ma_hang (PK)</td><td>VARCHAR</td><td class="font-sans">Mã sản phẩm/hàng hoá</td></tr>
+                                <tr><td class="py-1.5">Ten_hang</td><td>NVARCHAR</td><td class="font-sans">Tên hàng hoá</td></tr>
+                                <tr><td class="py-1.5">Dv_tinh</td><td>NVARCHAR</td><td class="font-sans">Cái, thùng, kg,...</td></tr>
+                                <tr><td class="py-1.5">Mo_ta_hang</td><td>NTEXT</td><td class="font-sans">Mô tả đặc tính hàng</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Entity 3: DON_DAT_HANG -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <div class="bg-slate-800 text-white px-4 py-2.5 font-semibold text-sm flex items-center justify-between">
+                        <span>3. DON_DAT_HANG</span>
+                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Thực thể quản lý</span>
+                    </div>
+                    <div class="p-4">
+                        <table class="w-full text-xs text-left">
+                            <thead class="text-slate-500 border-b border-slate-200 uppercase font-semibold">
+                                <tr>
+                                    <th class="py-1.5">Tên cột</th>
+                                    <th class="py-1.5">Loại</th>
+                                    <th class="py-1.5">Mô tả</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono text-slate-700">
+                                <tr><td class="py-1.5 font-bold text-indigo-600">So_DH (PK)</td><td>VARCHAR</td><td class="font-sans">Số đơn hàng</td></tr>
+                                <tr><td class="py-1.5">Ngay_dat</td><td>DATE</td><td class="font-sans">Ngày đặt hàng</td></tr>
+                                <tr><td class="py-1.5 text-amber-600">Ma_so_ND (FK)</td><td>VARCHAR</td><td class="font-sans">Mã người đặt hàng</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Entity 4: PHIEU_GIAO_HANG -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+                    <div class="bg-slate-800 text-white px-4 py-2.5 font-semibold text-sm flex items-center justify-between">
+                        <span>4. PHIEU_GIAO_HANG</span>
+                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Thực thể giao nhận</span>
+                    </div>
+                    <div class="p-4">
+                        <table class="w-full text-xs text-left">
+                            <thead class="text-slate-500 border-b border-slate-200 uppercase font-semibold">
+                                <tr>
+                                    <th class="py-1.5">Tên cột</th>
+                                    <th class="py-1.5">Loại</th>
+                                    <th class="py-1.5">Mô tả</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono text-slate-700">
+                                <tr><td class="py-1.5 font-bold text-indigo-600">So_PG (PK)</td><td>VARCHAR</td><td class="font-sans">Số phiếu giao hàng</td></tr>
+                                <tr><td class="py-1.5">Ngay_giao</td><td>DATE</td><td class="font-sans">Ngày giao hàng thực tế</td></tr>
+                                <tr><td class="py-1.5 text-amber-600">So_DH (FK)</td><td>VARCHAR</td><td class="font-sans">Thuộc đơn hàng số</td></tr>
+                                <tr><td class="py-1.5 text-amber-600">Ma_so_NG (FK)</td><td>VARCHAR</td><td class="font-sans">Người giao hàng</td></tr>
+                                <tr><td class="py-1.5 text-amber-600">Ma_so_NN (FK)</td><td>VARCHAR</td><td class="font-sans">Người nhận hàng</td></tr>
+                                <tr><td class="py-1.5 text-amber-600">Ma_so_DDG (FK)</td><td>VARCHAR</td><td class="font-sans">Địa điểm giao hàng</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Entity 5: CHI_TIET_DON_HANG -->
+                <div class="border border-emerald-200 rounded-xl overflow-hidden bg-emerald-50/30">
+                    <div class="bg-emerald-800 text-white px-4 py-2.5 font-semibold text-sm flex items-center justify-between">
+                        <span>5. CHI_TIET_DON_HANG</span>
+                        <span class="text-xs bg-emerald-700 text-emerald-100 px-2 py-0.5 rounded">Bảng trung gian (N-M)</span>
+                    </div>
+                    <div class="p-4">
+                        <table class="w-full text-xs text-left">
+                            <thead class="text-slate-500 border-b border-slate-200 uppercase font-semibold">
+                                <tr>
+                                    <th class="py-1.5">Tên cột</th>
+                                    <th class="py-1.5">Loại</th>
+                                    <th class="py-1.5">Mô tả</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono text-slate-700">
+                                <tr><td class="py-1.5 font-bold text-purple-700">So_DH (PK, FK)</td><td>VARCHAR</td><td class="font-sans">Số đơn đặt hàng</td></tr>
+                                <tr><td class="py-1.5 font-bold text-purple-700">Ma_hang (PK, FK)</td><td>VARCHAR</td><td class="font-sans">Mã mặt hàng đặt</td></tr>
+                                <tr><td class="py-1.5">So_luong</td><td>INT</td><td class="font-sans">Số lượng yêu cầu</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Entity 6: CHI_TIET_PHIEU_GIAO -->
+                <div class="border border-emerald-200 rounded-xl overflow-hidden bg-emerald-50/30">
+                    <div class="bg-emerald-800 text-white px-4 py-2.5 font-semibold text-sm flex items-center justify-between">
+                        <span>6. CHI_TIET_PHIEU_GIAO</span>
+                        <span class="text-xs bg-emerald-700 text-emerald-100 px-2 py-0.5 rounded">Bảng trung gian (N-M)</span>
+                    </div>
+                    <div class="p-4">
+                        <table class="w-full text-xs text-left">
+                            <thead class="text-slate-500 border-b border-slate-200 uppercase font-semibold">
+                                <tr>
+                                    <th class="py-1.5">Tên cột</th>
+                                    <th class="py-1.5">Loại</th>
+                                    <th class="py-1.5">Mô tả</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono text-slate-700">
+                                <tr><td class="py-1.5 font-bold text-purple-700">So_PG (PK, FK)</td><td>VARCHAR</td><td class="font-sans">Số phiếu giao</td></tr>
+                                <tr><td class="py-1.5 font-bold text-purple-700">Ma_hang (PK, FK)</td><td>VARCHAR</td><td class="font-sans">Mã mặt hàng giao</td></tr>
+                                <tr><td class="py-1.5">So_luong</td><td>INT</td><td class="font-sans">Số lượng đã giao</td></tr>
+                                <tr><td class="py-1.5">Don_gia</td><td>DECIMAL</td><td class="font-sans">Đơn giá bán</td></tr>
+                                <tr><td class="py-1.5">Thanh_tien</td><td>DECIMAL</td><td class="font-sans">Số lượng * Đơn giá</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Submission Helper Guide -->
+        <div id="github-guide" class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl text-white p-6 md:p-8 shadow-xl space-y-6">
+            <div class="flex items-center space-x-3 border-b border-slate-700/80 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl text-white">
+                    <i class="fa-brands fa-github"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold">Hướng Dẫn Nộp Bài Tập Lên GitHub</h3>
+                    <p class="text-xs text-slate-400">Thực hiện 3 bước đơn giản dưới đây để hoàn thành nộp liên kết</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Step 1 -->
+                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl space-y-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-500 text-white font-bold flex items-center justify-center text-sm shadow">
+                        1
+                    </div>
+                    <h4 class="font-semibold text-sm">Tải File Bài Làm</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Nhấn nút <span class="text-brand-400 font-semibold">"Tải ảnh PNG"</span> hoặc <span class="text-emerald-400 font-semibold">"Tải README.md"</span> ở góc trên cùng trang này về máy tính của bạn.
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl space-y-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-500 text-white font-bold flex items-center justify-center text-sm shadow">
+                        2
+                    </div>
+                    <h4 class="font-semibold text-sm">Upload Lên GitHub</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Tạo Repository mới trên GitHub (hoặc chọn repo sẵn có), chọn <span class="text-slate-100 font-mono bg-slate-700 px-1 py-0.5 rounded">Add file</span> ➔ <span class="text-slate-100 font-mono bg-slate-700 px-1 py-0.5 rounded">Upload files</span> và tải các file vừa bấm về lên.
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-xl space-y-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-500 text-white font-bold flex items-center justify-center text-sm shadow">
+                        3
+                    </div>
+                    <h4 class="font-semibold text-sm">Coppy & Nộp Link</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Sao chép đường dẫn Repository GitHub của bạn (VD: <span class="text-indigo-300 font-mono">https://github.com/user/quan-ly-don-hang</span>) và dán vào ô nộp bài hệ thống.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center space-x-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none z-50">
+        <div id="toast-icon" class="text-emerald-400"><i class="fa-solid fa-circle-check"></i></div>
+        <div id="toast-message" class="text-xs font-medium">Thông báo</div>
+    </div>
+
+    <script>
+        // Zoom state
+        let currentZoom = 1;
+        const erdContainer = document.getElementById('erd-container');
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose',
+            er: {
+                useMaxWidth: false,
+                layoutDirection: 'TB',
+                entityPadding: 20
+            }
+        });
+
+        // Zoom Functions
+        function zoomERD(delta) {
+            currentZoom = Math.min(Math.max(0.5, currentZoom + delta), 2.5);
+            updateZoomTransform();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            updateZoomTransform();
+        }
+
+        function updateZoomTransform() {
+            erdContainer.style.transform = `scale(${currentZoom})`;
+            zoomLevelDisplay.innerText = `Thu phóng: ${Math.round(currentZoom * 100)}%`;
+        }
+
+        function toggleFullscreen() {
+            const viewport = document.getElementById('erd-viewport');
+            if (!document.fullscreenElement) {
+                viewport.requestFullscreen().catch(err => {
+                    showToast("Khởi chạy chế độ toàn màn hình thất bại", "error");
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Show Toast Function
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMessage.innerText = message;
+            if (type === "success") {
+                toastIcon.className = "text-emerald-400 text-base";
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else {
+                toastIcon.className = "text-rose-400 text-base";
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // Export to SVG
+        function downloadSVG() {
+            const svgElement = document.querySelector('.mermaid svg');
+            if (!svgElement) {
+                showToast("Đang tải sơ đồ, vui lòng thử lại sau!", "error");
+                return;
+            }
+
+            const serializer = new XMLSerializer();
+            let svgString = serializer.serializeToString(svgElement);
+            
+            // Ensure encoding
+            svgString = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + svgString;
+            
+            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'ERD_Quan_Ly_Don_Hang.svg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast("Đã tải file ERD_Quan_Ly_Don_Hang.svg!");
+        }
+
+        // Export to PNG
+        function downloadPNG() {
+            const svgElement = document.querySelector('.mermaid svg');
+            if (!svgElement) {
+                showToast("Đang tải sơ đồ, vui lòng thử lại sau!", "error");
+                return;
+            }
+
+            // Get standard SVG dimensions
+            const bbox = svgElement.getBBox();
+            const width = Math.max(bbox.width + 80, 1000);
+            const height = Math.max(bbox.height + 80, 800);
+
+            const serializer = new XMLSerializer();
+            let svgString = serializer.serializeToString(svgElement);
+
+            // Create canvas element
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const scale = 2; // High-DPI scale multiplier
+
+            canvas.width = width * scale;
+            canvas.height = height * scale;
+
+            const img = new Image();
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function () {
+                ctx.scale(scale, scale);
+                // Fill white background
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+                // Draw SVG image centered
+                ctx.drawImage(img, 20, 20);
+
+                const pngUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = pngUrl;
+                link.download = 'ERD_Quan_Ly_Don_Hang.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                showToast("Đã tải thành công ảnh ERD_Quan_Ly_Don_Hang.png chất lượng cao!");
+            };
+
+            img.src = url;
+        }
+
+        // Download README.md
+        function downloadREADME() {
+            const readmeText = `# Sơ Đồ ERD - Hệ Thống Quản Lý Đơn Đặt Hàng
+
+Bài làm thực hành thiết kế Cơ sở dữ liệu và xây dựng Sơ đồ Thực thể - Liên kết (ERD) cho bài toán Quản Lý Đơn Đặt Hàng.
+
+## 1. Sơ Đồ ERD (Mermaid Code)
+
+\`\`\`mermaid
+erDiagram
+    DON_VI_KHACH {
+        string Ma_DV PK "Mã đơn vị"
+        string Ten_DV "Tên đơn vị"
+        string Dia_chi "Địa chỉ"
+        string Dien_thoai "Điện thoại"
+    }
+
+    NGUOI_DAT {
+        string Ma_so_ND PK "Mã số người đặt"
+        string Ho_ten_ND "Họ tên người đặt"
+        string Ma_DV FK "Đơn vị đặt"
+    }
+
+    NGUOI_NHAN {
+        string Ma_so_NN PK "Mã số người nhận"
+        string Ho_ten_NN "Họ tên người nhận"
+        string Ma_DV FK "Đơn vị khách"
+    }
+
+    NGUOI_GIAO {
+        string Ma_so_NG PK "Mã số người giao"
+        string Ho_ten_NG "Họ tên người giao"
+    }
+
+    NOI_GIAO {
+        string Ma_so_DDG PK "Mã số nơi giao"
+        string Ten_noi_giao "Tên địa điểm giao"
+    }
+
+    HANG {
+        string Ma_hang PK "Mã hàng hoá"
+        string Ten_hang "Tên hàng hoá"
+        string Dv_tinh "Đơn vị tính"
+        string Mo_ta_hang "Mô tả chi tiết"
+    }
+
+    DON_DAT_HANG {
+        string So_DH PK "Số đơn hàng"
+        date Ngay_dat "Ngày đặt hàng"
+        string Ma_so_ND FK "Người đặt"
+    }
+
+    PHIEU_GIAO_HANG {
+        string So_PG PK "Số phiếu giao"
+        date Ngay_giao "Ngày giao"
+        string So_DH FK "Theo đơn hàng"
+        string Ma_so_NG FK "Người giao"
+        string Ma_so_NN FK "Người nhận"
+        string Ma_so_DDG FK "Nơi giao"
+    }
+
+    CHI_TIET_DON_HANG {
+        string So_DH PK_FK "Số đơn hàng"
+        string Ma_hang PK_FK "Mã hàng"
+        int So_luong "Số lượng đặt"
+    }
+
+    CHI_TIET_PHIEU_GIAO {
+        string So_PG PK_FK "Số phiếu giao"
+        string Ma_hang PK_FK "Mã hàng"
+        int So_luong "Số lượng giao"
+        double Don_gia "Đơn giá giao"
+        double Thanh_tien "Thành tiền"
+    }
+
+    DON_VI_KHACH ||--o{ NGUOI_DAT : "có_người_đặt"
+    DON_VI_KHACH ||--o{ NGUOI_NHAN : "có_người_nhận"
+    NGUOI_DAT ||--o{ DON_DAT_HANG : "lập"
+    DON_DAT_HANG ||--o{ CHI_TIET_DON_HANG : "chứa"
+    HANG ||--o{ CHI_TIET_DON_HANG : "được_đặt"
+    DON_DAT_HANG ||--o{ PHIEU_GIAO_HANG : "phát_sinh"
+    NGUOI_GIAO ||--o{ PHIEU_GIAO_HANG : "thực_hiện"
+    NGUOI_NHAN ||--o{ PHIEU_GIAO_HANG : "tiếp_nhận"
+    NOI_GIAO ||--o{ PHIEU_GIAO_HANG : "giao_tại"
+    PHIEU_GIAO_HANG ||--o{ CHI_TIET_PHIEU_GIAO : "chứa"
+    HANG ||--o{ CHI_TIET_PHIEU_GIAO : "được_giao"
+\`\`\`
+
+---
+
+## 2. Danh Sách Các Bảng CSDL Chuẩn Hóa
+
+### 2.1 Bảng DON_VI_KHACH
+- \`Ma_DV\` (PK, VARCHAR): Mã đơn vị khách hàng.
+- \`Ten_DV\` (NVARCHAR): Tên đơn vị khách hàng.
+- \`Dia_chi\` (NVARCHAR): Địa chỉ đơn vị.
+- \`Dien_thoai\` (VARCHAR): Số điện thoại liên lạc.
+
+### 2.2 Bảng HANG
+- \`Ma_hang\` (PK, VARCHAR): Mã hàng hoá.
+- \`Ten_hang\` (NVARCHAR): Tên mặt hàng.
+- \`Dv_tinh\` (NVARCHAR): Đơn vị tính (Thùng, chiếc, kg...).
+- \`Mo_ta_hang\` (NTEXT): Mô tả chi tiết hàng.
+
+### 2.3 Bảng DON_DAT_HANG
+- \`So_DH\` (PK, VARCHAR): Số đơn hàng.
+- \`Ngay_dat\` (DATE): Ngày lập đơn đặt hàng.
+- \`Ma_so_ND\` (FK, VARCHAR): Mã người đặt hàng.
+
+### 2.4 Bảng PHIEU_GIAO_HANG
+- \`So_PG\` (PK, VARCHAR): Số phiếu giao hàng.
+- \`Ngay_giao\` (DATE): Ngày tiến hành giao hàng.
+- \`So_DH\` (FK, VARCHAR): Mã đơn đặt hàng liên quan.
+- \`Ma_so_NG\` (FK, VARCHAR): Mã người thực hiện giao.
+- \`Ma_so_NN\` (FK, VARCHAR): Mã người nhận hàng.
+- \`Ma_so_DDG\` (FK, VARCHAR): Mã địa điểm/nơi giao.
+
+### 2.5 Bảng CHI_TIET_DON_HANG
+- \`So_DH\` (PK, FK, VARCHAR): Số đơn đặt hàng.
+- \`Ma_hang\` (PK, FK, VARCHAR): Mã hàng đặt.
+- \`So_luong\` (INT): Số lượng yêu cầu đặt.
+
+### 2.6 Bảng CHI_TIET_PHIEU_GIAO
+- \`So_PG\` (PK, FK, VARCHAR): Số phiếu giao hàng.
+- \`Ma_hang\` (PK, FK, VARCHAR): Mã hàng thực tế giao.
+- \`So_luong\` (INT): Số lượng thực giao.
+- \`Don_gia\` (DECIMAL): Đơn giá giao hàng.
+- \`Thanh_tien\` (DECIMAL): Thành tiền (Số lượng * Đơn giá).
+`;
+
+            const blob = new Blob([readmeText], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'README.md';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showToast("Đã tải file README.md sẵn sàng upload lên GitHub!");
+        }
+    </script>
+</body>
+</html>
